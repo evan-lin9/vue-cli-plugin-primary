@@ -1,6 +1,6 @@
 {
   "name": "vue-cli-plugin-primary",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "vue-cli plugin to automatic generate route",
   "main": "index.js",
   "keywords": [
@@ -17,16 +17,17 @@
   "dependencies": {
     "glob": "^7.1.6",
     "pify": "^5.0.0",
-    "@vue/compiler-sfc": "3.x"
+    "@vue/compiler-sfc": "3.x",
+    "@babel/traverse": "7.x"
   },
   "peerDependencies": {
     "vue-router": "4.x"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SkyLin0909/vue-cli-plugin-umijs.git"
+    "url": "git+https://github.com/SkyLin0909/vue-cli-plugin-primary.git"
   },
-  "homepage": "https://github.com/SkyLin0909/vue-cli-plugin-umijs.git#readme",
+  "homepage": "https://github.com/SkyLin0909/vue-cli-plugin-primary.git#readme",
   "author": "SkyLin0909",
   "license": "ISC"
 }

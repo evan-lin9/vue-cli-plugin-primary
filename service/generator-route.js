@@ -4,15 +4,15 @@ const path = require('path');
 const { mkdir, readFileSync, writeFile } = require('fs');
 const glob = pify(Glob);
 const { parse } = require('@vue/compiler-sfc')
+const parser = require("@babel/parser");
+const traverse = require("@babel/traverse").default;
 
 // 考虑多种情况：
 // 可能是目录，没有后缀，比如 [post]/index.vue
 // 可能是文件，有后缀，比如 [index].vue
 // [id$] 是可选动态路由
 const RE_DYNAMIC_ROUTE = /^\[(.+?)\]/;
-const RE_META_OBJECT = /^export default:(.+?)}$/;
-
-const camelCase = (string) => string.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())
+const META_SUPPORT_TYPE = ['StringLiteral', 'NumericLiteral', 'BooleanLiteral']
 
 const generateRoutesAndFiles = async () => {
   const files = {};
@@ -75,19 +75,49 @@ function normalizePath(string) {
   }
 }
 
-function normalizeName() {
-  // name: routeName(file)
+function normalizeMetaInfo(nodes) {
+  const meta = {}
+  nodes.forEach(node => {
+    const { key, value } = node
+    if (~META_SUPPORT_TYPE.indexOf(value.type)) {
+      meta[key.name] = value.value
+    }
+  })
+  return meta
 }
 
 function normalizeRoute(route) {
   let props;
   if (route.component) {
     try {
+      // 得想办法从 script 标签下取出name 和 meta
       const source = readFileSync(`src/${route.component}`, 'utf-8');
       const parsed = parse(source).descriptor
       if (parsed.script && parsed.script.content) {
-        const content = parsed.script.content
-        // 得想办法从 script 标签下取出name 和 meta
+        const code = parsed.script.content
+        const ast = parser.parse(code, { sourceType: 'module' })
+        const visitor = {
+          ExportDefaultDeclaration(path) {
+            const {
+              declaration: { properties }
+            } = path.node;
+            let len = properties.length;
+            let index = -1;
+            let target = 0; // 用语标记 name 和 meta 属性已经处理完毕
+            while (len-- && target !== 2) {
+              const { key, value } = properties[++index];
+              if (key.name === 'name' && value.type === 'StringLiteral') {
+                target++
+                route.name = value.value
+              } else if (key.name === 'meta' && value.type === 'ObjectExpression') {
+                target++
+                // 只处理对象的第一层，暂不支持递归处理
+                route.meta = normalizeMetaInfo(value.properties)
+              }
+            }
+          }
+        };
+        traverse(ast, visitor)
       }
     } catch (e) {
       throw new Error(

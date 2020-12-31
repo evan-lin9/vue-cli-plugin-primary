@@ -1,7 +1,7 @@
 {
   "name": "vue-cli-plugin-primary",
-  "version": "0.0.2",
-  "description": "vue-cli plugin to automatic generate route",
+  "version": "0.1.0",
+  "description": "vue-cli plugin to automatic generate route and meta info",
   "main": "index.js",
   "keywords": [
     "vue",
@@ -25,9 +25,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SkyLin0909/vue-cli-plugin-primary.git"
+    "url": "git+https://github.com/evan-lin9/vue-cli-plugin-primary.git"
   },
-  "homepage": "https://github.com/SkyLin0909/vue-cli-plugin-primary.git#readme",
-  "author": "SkyLin0909",
+  "homepage": "https://github.com/evan-lin9/vue-cli-plugin-primary.git#readme",
+  "author": "evan-lin9",
   "license": "ISC"
 }

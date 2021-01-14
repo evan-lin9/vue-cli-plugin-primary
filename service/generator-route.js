@@ -14,14 +14,20 @@ const traverse = require("@babel/traverse").default;
 const RE_DYNAMIC_ROUTE = /^\[(.+?)\]/;
 const META_SUPPORT_TYPE = ['StringLiteral', 'NumericLiteral', 'BooleanLiteral']
 
-const generateRoutesAndFiles = async () => {
+const generateRoutesAndFiles = async (matchPath) => {
   const files = {};
 
   (await glob(
-    `views/biz-*/pages/**/*.{vue,js}`,
+    `${matchPath}/**/*.{vue,js}`,
     {
       cwd: path.resolve(process.cwd(), './src'),
-      ignore: ['**/*.test.*', '**/*.spec.*', '.*', '_*']
+      ignore: [
+        '**/*.test.*',
+        '**/*.spec.*',
+        '**/{api,hooks,components}/**/*',
+        '.*',
+        '_*'
+      ]
     })
   ).forEach(file => {
     const key = file.replace(/\.(js|vue)$/, '')
@@ -50,7 +56,7 @@ const createRoutes = (files, pagesDir) => {
       path: '',
       component: file,
     };
-    let path = paths.map(p => {
+    const path = paths.map(p => {
       // dynamic route
       p = p.replace(RE_DYNAMIC_ROUTE, ':$1')
       // :id$ => :id?
@@ -67,14 +73,6 @@ const createRoutes = (files, pagesDir) => {
   return normalizeRoutes(routes)
 }
 
-function normalizePath(string) {
-  const path = string.split('/').filter(p => p !== 'pages').join('/')
-  // biz-xxxx => xxxx
-  if (path.startsWith('/biz-')) {
-    return '/' + path.slice(5)
-  }
-}
-
 function normalizeMetaInfo(nodes) {
   const meta = {}
   nodes.forEach(node => {
@@ -86,13 +84,22 @@ function normalizeMetaInfo(nodes) {
   return meta
 }
 
+function normalizePath(path) {
+  if (path.endsWith('index')) {
+    return path.replace(/index$/, '')
+  }
+  return path
+}
+
 function normalizeRoute(route) {
   let props;
+ 
   if (route.component) {
     try {
-      // 得想办法从 script 标签下取出name 和 meta
+      // 基于 babel 拿到到 AST，从 script 标签内容中取出 name 和 meta
       const source = readFileSync(`src/${route.component}`, 'utf-8');
       const parsed = parse(source).descriptor
+
       if (parsed.script && parsed.script.content) {
         const code = parsed.script.content
         const ast = parser.parse(code, { sourceType: 'module' })
@@ -103,7 +110,8 @@ function normalizeRoute(route) {
             } = path.node;
             let len = properties.length;
             let index = -1;
-            let target = 0; // 用语标记 name 和 meta 属性已经处理完毕
+            let target = 0; // 用于标记 name 和 meta 属性已经处理完毕
+
             while (len-- && target !== 2) {
               const { key, value } = properties[++index];
               if (key.name === 'name' && value.type === 'StringLiteral') {
@@ -117,6 +125,7 @@ function normalizeRoute(route) {
             }
           }
         };
+
         traverse(ast, visitor)
       }
     } catch (e) {
@@ -134,6 +143,7 @@ function normalizeRoute(route) {
     }
     route.component = `() => import('@/${route.component}')`
   }
+
   return {
     ...route,
     ...(typeof props === 'object' ? props : {}),
@@ -146,9 +156,9 @@ function normalizeRoutes(routes) {
     .map(v => ({ ...v, path: normalizePath(v.path)}))
 }
 
-module.exports.createRouter = (flag = false) => {
+module.exports.createRouter = (options, flag = false) => {
   if (flag) return
-  generateRoutesAndFiles().then(res => {
+  generateRoutesAndFiles(options.routeMatchPath).then(res => {
     const string = `export default ${JSON.stringify(res, null, 2)};`
       .replace(/"component": "(\w+?)"/g, `"component": $1`)
       .replace(/"(\w+?)":/g, '$1:')
@@ -160,7 +170,7 @@ module.exports.createRouter = (flag = false) => {
         console.log('routes file already exists')
       }
     })
-    writeFile(path.resolve(process.cwd(), './src/router/routes.js'), string, () => {
+    writeFile(path.resolve(process.cwd(), `${options.fileSavePath}`), string, () => {
       console.log('routes generated')
     })
   })

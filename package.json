@@ -1,6 +1,6 @@
 {
   "name": "vue-cli-plugin-primary",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "vue-cli plugin to automatic generate route and meta info",
   "main": "index.js",
   "keywords": [

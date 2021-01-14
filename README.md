@@ -5,7 +5,7 @@
 按照官方 [vue-cli-plugin](https://cli.vuejs.org/zh/dev-guide/plugin-dev.html) 的规范，实现路由配置的自动生成，具体规则请看使用说明
 
 
-## 1. 安装
+## 0. 安装
 
 ```bash
 yarn add vue-cli-plugin-primary
@@ -16,11 +16,24 @@ npm i vue-cli-plugin-primary
 ```
 
 
-
 调用插件
 
 ```bash
 vue invoke vue-cli-plugin-primary
+```
+
+
+## 1. 配置参数
+在 `vue.config.js` 中增加对应差距的配置 `pluginOptions.routes`
+```js
+module.exports = {
+  // ...
+  pluginOptions: {
+    routes: {
+      
+    }
+  }
+}
 ```
 
 

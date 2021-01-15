@@ -10,13 +10,13 @@ const defaultOptions = {
 module.exports = (api, vueConfigOptions) => {
   // const { serve, build } = api.service.commands
   api.registerCommand(
-    'routes',
+    'primary',
     {
       description: 'Automatically generate routes configuration based on files starting with biz-* in the pages folder',
-      usage: 'vue-cli-service routes'
+      usage: 'vue-cli-service primary'
     },
     () => {
-      let options = get(vueConfigOptions, 'pluginOptions.routes', null)
+      let options = get(vueConfigOptions, 'pluginOptions.primary', null)
       if (options && Object.prototype.toString.call(options) === '[object Object]') {
         options = { ...defaultOptions, ...options }
       } else {

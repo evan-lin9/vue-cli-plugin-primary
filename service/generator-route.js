@@ -61,11 +61,6 @@ const createRoutes = (files, pagesDir) => {
     const path = paths.map(p => {
       // dynamic route
       p = p.replace(RE_DYNAMIC_ROUTE, ':$1')
-      // 后续考虑用 [] 表示可选路由
-      // :id$ => :id?
-      // if (p.endsWith('$')) {
-      //   p = p.slice(0, -1) + '?'
-      // }
       return p
     })
     .join('/');
@@ -165,7 +160,7 @@ function normalizeRoutes(routes) {
     .map(v => ({ ...v, path: normalizePath(v.path)}))
   const routerConfig = [
     {
-      path: '',
+      path: '/',
       component: 'Layout',
       children: [],
     }
@@ -185,7 +180,7 @@ function normalizeRoutes(routes) {
       if (index === -1) {
         layouts.push(layout)
         index = routerConfig.push({
-          path: '',
+          path: '/',
           component: layout,
           children: []
         }) - 1

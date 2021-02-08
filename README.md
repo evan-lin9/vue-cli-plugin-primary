@@ -1,10 +1,19 @@
 # vue-cli-plugin-primary
 
-> 目前这个插件依赖的 vue-cli 4.5x，路由版本为最新的 vue-router 4.x, 仅支持 vue ^3.0.0
+> 目前这个插件依赖的 vue-cli 4.5x，路由版本为最新的 vue-router 4.x， 仅支持 vue ^3.0.0
 
 按照官方 [vue-cli-plugin](https://cli.vuejs.org/zh/dev-guide/plugin-dev.html) 的规范，实现路由配置的自动生成，具体规则请看使用说明
 
-![demo](http://qm6xd205h.hd-bkt.clouddn.com/vue-cli-plugin-primary.png)
+![demo](http://evan-lin.com/vue-cli-plugin-primary.png)
+
+## **【Feature 功能】**
+
+- [x] 支持传入约定路由的根路径与解析规则
+- [x] 动态路由
+- [x] 忽略路由
+- [x] 扩展路由属性 `meta`
+- [x] 支持不同的全局 `layout`
+- [ ] 根据路由生成 `menuTree` 层级目录
 
 ## 0. 安装
 
@@ -216,14 +225,3 @@ export default [
   }
 ];
 ```
-
-
-
-## **【Feature功能】**
-
-- [ ] 支持TS
-- [x] 扩展路由属性 `name` 和 `meta`
-- [ ] 支持生成 `menuTree` 层级目录
-- [ ] 完善文档与单元测试
-- [x] 支持传入约定路由的根路径与解析规则
-
